@@ -19,8 +19,11 @@ namespace settings
     inline constexpr unsigned int CELL_C     = BOARD_H*BOARD_W;
     inline constexpr unsigned int CELL_S     = 25;
     inline constexpr unsigned int BOMBS      = 40;
-    inline constexpr unsigned int BOARDX_OFF = (800 - BOARD_W * CELL_S) / 2;
-    inline constexpr unsigned int BOARDY_OFF = (800 - BOARD_H * CELL_S) / 2;
+    inline constexpr unsigned int BOARDX_OFF = (SCREEN_W - BOARD_W * CELL_S) / 2;
+    inline constexpr unsigned int BOARDY_OFF = (SCREEN_H - BOARD_H * CELL_S) / 2;
+
+    // Lable
+    inline constexpr unsigned int FONTSIZE   = 4;
 
     // Setting checks
     static_assert(

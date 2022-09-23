@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "utils.cpp"
 #include <memory.h>
 #include <stdlib.h>
 #include <iostream>
@@ -10,7 +11,36 @@ Board::Board()
 
 }
 
-void Board::initCells()
+void Board::revealBombs()
+{
+    for(Cell &cell : cells)
+    {
+        if(cell.flaged)
+            continue;
+        if(cell.val == 9)
+            cell.revealed = true;
+    }
+}
+void Board::initForbIdxs(int idx, int *output) const
+{
+    int x = idx % settings::BOARD_W;
+    int y = idx / settings::BOARD_W;
+    int i = 0;
+    for(int nx = x-1; nx <= x+1; nx++){
+        for(int ny = y-1; ny <= y+1; ny++){
+            int nidx = ny * settings::BOARD_W + nx;
+
+            if(nidx < 0 || nidx > settings::CELL_C-1) output[i] = -1;
+            if(checkX(nx)) output[i] = -1;
+            if(checkY(ny)) output[i] = -1;
+
+            output[i++] = nidx;
+            
+        }
+    }
+}
+
+void Board::clearBoard()
 {
     for(Cell &cell : cells)
     {
@@ -19,7 +49,12 @@ void Board::initCells()
         cell.revealed = false;
         cell.color = GRAY;
     }
-    distrobuteBombs();
+}
+
+void Board::initCells(int idx)
+{
+    clearBoard();
+    distrobuteBombs(idx);
     findBombs();
 }
 
@@ -73,19 +108,25 @@ void Board::draw() const
     EndDrawing();
 }
 
-void Board::distrobuteBombs()
+void Board::distrobuteBombs(int idx)
 {
     int bombs = settings::BOMBS;
-    int spots = settings::CELL_C;
+    int spots = settings::CELL_C - 9;
+    int forbidden_idxs[9];
 
-    for(Cell &x : cells)
+    initForbIdxs(idx, forbidden_idxs);
+
+    for(int i = 0; i < settings::CELL_C; i++)
     {
+        if(in_intArr(i, forbidden_idxs, 9))
+            continue;
         if (bombs == 0)
             break;
 
         int c = (spots--/bombs)-1;
+
         if(rand()%c == 0){
-            x.val = 9;
+            cells[i].val = 9;
             bombs--;
         }
     }
@@ -103,9 +144,10 @@ void Board::findBombs()
                 if(checkX(nx)) break;
                 if (checkY(ny)) continue;
                 
-                if(cells[ny*settings::BOARD_W+nx].val == 9 && cells[idx].val < 9)
+                if(cells[ny*settings::BOARD_W+nx].val == 9 && cells[idx].val < 9){
                     cells[idx].val++;
-                    assert(cells[idx].val++ < 9);
+                    assert(cells[idx].val < 9);
+                }
             }
         }
         cells[idx].color = colors[cells[idx].val];

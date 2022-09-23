@@ -39,9 +39,13 @@ int main(void){
     switch(state)
     {
     case EMPTY:
+      b.clearBoard();
       if(b.containsMouse()){
         int idx = mouseLoc2Idx();
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            b.initCells(idx);
+            b.revealCells(idx);
+            state = RUNNING;
         }
       }
       break;
@@ -54,7 +58,15 @@ int main(void){
         }else if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)){
           b.cells[idx].flaged = !b.cells[idx].flaged;
         }
+      }
       break;
+    case OVER:
+      b.revealBombs();
+      DrawText("To play again, press `r`", settings::BOARDX_OFF,
+               settings::BOARDY_OFF      , settings::FONTSIZE,
+               RED);
+      if (IsKeyPressed(KEY_R)){
+          state = EMPTY;
       }
     }
   }

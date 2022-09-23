@@ -8,10 +8,13 @@ class Board{
 
     Board();
     void draw() const;
-    void distrobuteBombs();
+    void distrobuteBombs(int idx);
     void findBombs();
     bool containsMouse();
     bool revealCells(int idx);
+    void initCells(int idx);
+    void clearBoard();
+    void revealBombs();
 
     private:
     const Color colors[10] = {
@@ -27,7 +30,7 @@ class Board{
         BLACK
     };
     
-    void initCells();
+    void initForbIdxs(int idx, int *output) const;
     inline bool checkX(int x) const;
     inline bool checkY(int y) const;
 };

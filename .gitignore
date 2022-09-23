@@ -1,3 +1,6 @@
 *.exe
 .vs/
 .vscode/
+tags
+edit.bat
+build.bat
