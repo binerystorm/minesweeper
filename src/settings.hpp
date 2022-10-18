@@ -15,7 +15,7 @@ namespace settings
 
     // Game setttings
     inline constexpr unsigned int BOARD_W    = 16;
-    inline constexpr unsigned int BOARD_H    = 16;
+    inline constexpr unsigned int BOARD_H    = 20;
     inline constexpr unsigned int CELL_C     = BOARD_H*BOARD_W;
     inline constexpr unsigned int CELL_S     = 25;
     inline constexpr unsigned int BOMBS      = 40;

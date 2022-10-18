@@ -4,15 +4,17 @@
 
 class Board{
     public:
-    Cell cells[settings::CELL_C];
+    static const int32_t width = settings::BOARD_W;
+    static const int32_t hight = settings::BOARD_H;
 
-    Board();
+    Cell cells[width][hight];
+
     void draw() const;
-    void distrobuteBombs(int idx);
+    void distrobuteBombs(int32_t x, int32_t y);
     void findBombs();
     bool containsMouse();
-    bool revealCells(int idx);
-    void initCells(int idx);
+    bool revealCells(int32_t x, int32_t y);
+    void initCells(int32_t x, int32_t y);
     void clearBoard();
     void revealBombs();
 
@@ -31,6 +33,7 @@ class Board{
     };
     
     void initForbIdxs(int idx, int *output) const;
+    bool forbiddenIdx(int32_t x, int32_t y, int32_t mx, int32_t my);
     inline bool checkX(int x) const;
     inline bool checkY(int y) const;
 };
