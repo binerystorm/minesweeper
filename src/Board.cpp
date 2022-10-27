@@ -101,8 +101,6 @@ bool Board::revealCells(int32_t x, int32_t y)
 
 void Board::draw() const
 {
-    BeginDrawing();
-    ClearBackground(BLACK);
     for(int x=0; x<width; x++){
         for(int y=0; y<hight; y++)
             cells[x][y].draw(
@@ -110,7 +108,6 @@ void Board::draw() const
                 settings::BOARDY_OFF + y * settings::CELL_S
             );
     }
-    EndDrawing();
 }
 
 void Board::distrobuteBombs(int32_t mx, int32_t my)

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Board.hpp"
+#include "Lable.hpp"
 
 int main(void);
 int mouseLoc2Idx(void);
@@ -38,19 +39,25 @@ int main(void){
 
     InitWindow(settings::SCREEN_W, settings::SCREEN_H, "core");
     SetTargetFPS(settings::FPS);
+    Lable endGame[] = {Lable(0,0, "GAME OVER"), Lable(50, 50, "`r` to restart")};
+    Lable empty[] = {Lable(settings::SCREEN_W / 2, settings::SCREEN_H / 2, "click")};
 
     Board b{};
     GameState state = EMPTY;
 
     while(!WindowShouldClose())
     {
-        b.draw();
         int32_t x = getBoardMouseX();
         int32_t y = getBoardMouseY();
 
+        BeginDrawing();
+        ClearBackground(BLACK);
+        b.draw();
         switch(state)
         {
             case EMPTY:
+                for(Lable l : empty)
+                    l.draw();
                 b.clearBoard();
                 if(b.containsMouse() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                     b.initCells(x, y);
@@ -70,13 +77,13 @@ int main(void){
                 break;
             case OVER:
                 b.revealBombs();
-                DrawText("To play again, press `r`", settings::BOARDX_OFF,
-                        settings::BOARDY_OFF      , settings::FONTSIZE,
-                        RED);
+                for (Lable l : endGame)
+                    l.draw();
                 if (IsKeyPressed(KEY_R)){
                     state = EMPTY;
                 }
         }
+        EndDrawing();
     }
 
     return 0;
