@@ -1,9 +1,7 @@
 #include "Board.hpp"
 #include <memory.h>
 #include <stdlib.h>
-#include <iostream>
 #include <assert.h>
-#include <thread>
 
 void Board::revealBombs()
 {
@@ -16,24 +14,7 @@ void Board::revealBombs()
         }
     }
 }
-void Board::initForbIdxs(int idx, int *output) const
-{
-    int x = idx % settings::BOARD_W;
-    int y = idx / settings::BOARD_W;
-    int i = 0;
-    for(int nx = x-1; nx <= x+1; nx++){
-        for(int ny = y-1; ny <= y+1; ny++){
-            int nidx = ny * settings::BOARD_W + nx;
 
-            if(nidx < 0 || nidx > settings::CELL_C-1) output[i] = -1;
-            if(checkX(nx)) output[i] = -1;
-            if(checkY(ny)) output[i] = -1;
-
-            output[i++] = nidx;
-            
-        }
-    }
-}
 bool Board::forbiddenIdx(int32_t x, int32_t y, int32_t mx, int32_t my)
 {
     for(int nx = mx-1; nx <= mx+1; nx++){
@@ -115,15 +96,11 @@ void Board::distrobuteBombs(int32_t mx, int32_t my)
     int bombs = settings::BOMBS;
     int spots = settings::CELL_C - 9;
 
-    //initForbIdxs(idx, forbidden_idxs);
 
     for(int x = 0; x < width; x++)
     {
         for(int y = 0; y < hight; y++)
         {
-            //assert(false && "TODO: replace with is forbidden function");
-            // if(in_intArr(i, forbidden_idxs, 9))
-            //     continue;
             if(forbiddenIdx(x, y, mx, my))
                 continue;
             if (bombs == 0)
