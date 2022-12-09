@@ -3,6 +3,21 @@
 #include <stdlib.h>
 #include <assert.h>
 
+bool Board::winState(){
+    int flags = 0;
+    for(int x = 0; x < width; x++){
+        for(int y = 0; y < hight; y++){
+            if (cells[x][y].flaged){
+                if (cells[x][y].val == 9)
+                    flags++;
+                else 
+                    return false;
+            }
+        }
+    }
+    return flags == settings::BOMBS; 
+    
+}
 void Board::revealBombs()
 {
     for(int x=0; x<width; x++){

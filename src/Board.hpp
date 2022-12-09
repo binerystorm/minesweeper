@@ -11,6 +11,7 @@ class Board{
 
     void draw() const;
     void distrobuteBombs(int32_t x, int32_t y);
+    bool winState();
     void findBombs();
     bool containsMouse();
     bool revealCells(int32_t x, int32_t y);
