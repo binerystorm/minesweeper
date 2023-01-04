@@ -1,23 +1,85 @@
 #include "Board.hpp"
 #include <memory.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <iostream>
+#include <cassert>
 
-bool Board::winState(){
+static inline uint32_t getBoardMouseY(void)
+{
+  return (GetMouseY() - settings::BOARDY_OFF) / settings::CELL_S;
+}
+
+static inline uint32_t getBoardMouseX(void)
+{
+  return (GetMouseX() - settings::BOARDX_OFF) / settings::CELL_S;
+}
+
+void Board::onSucces(SuccesState state)
+{
+    SuccesEventArg arg = SuccesEventArg(state);
+    succesEvent.trigger(&arg);
+}
+
+void Board::update()
+{
+    if (!containsMouse()) return;
+
+    uint32_t cx = getBoardMouseX();
+    uint32_t cy = getBoardMouseY();
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        revealCells(cx, cy);
+    if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        cells[cx][cy].flaged = !cells[cx][cy].flaged;
+
+    winState();
+}
+
+void Board::winState(){
     int flags = 0;
     for(int x = 0; x < width; x++){
         for(int y = 0; y < hight; y++){
-            if (cells[x][y].flaged){
-                if (cells[x][y].val == 9)
-                    flags++;
-                else 
-                    return false;
+            if (!(cells[x][y].revealed || cells[x][y].flaged)) return;
+            if (!(cells[x][y].flaged && cells[x][y].val == 9))
+                continue;
+            flags++;
+        }
+    }
+    if(flags == settings::BOMBS)
+        onSucces(WIN);
+}
+
+void Board::revealCells(int32_t x, int32_t y)
+{
+    switch(cells[x][y].val){
+    case 9:
+    {
+        cells[x][y].revealed = true;
+        onSucces(LOOSE);
+    }
+    break;
+
+    case 0:
+    {
+        cells[x][y].revealed = true;
+        for(int nx = x-1; nx <= x+1; nx++){
+            for(int ny = y-1; ny <= y+1; ny++){
+
+                if(checkX(nx)) break;
+                if(checkY(ny)) continue;
+
+                if (!cells[nx][ny].revealed && !cells[nx][ny].flaged)
+                    revealCells(nx, ny);
             }
         }
     }
-    return flags == settings::BOMBS; 
-    
+    break;
+
+    default:
+        cells[x][y].revealed = true;
+        break;
+    }
 }
+
 void Board::revealBombs()
 {
     for(int x=0; x<width; x++){
@@ -54,45 +116,22 @@ void Board::clearBoard()
     }
 }
 
-void Board::initCells(int32_t x, int32_t y)
+bool Board::tryInitCells()
 {
-    assert(!checkX(x) && !checkY(y) && "given arguments out of range");
-    clearBoard();
-    distrobuteBombs(x, y);
-    findBombs();
-}
+    if (!containsMouse()) return false;
 
-bool Board::revealCells(int32_t x, int32_t y)
-{
+    uint32_t cx = getBoardMouseX();
+    uint32_t cy = getBoardMouseY();
 
-
-    switch(cells[x][y].val){
-    case 9:
-        cells[x][y].revealed = true;
-        return false;
-
-    case 0:
-    {
-        cells[x][y].revealed = true;
-        draw();
-        for(int nx = x-1; nx <= x+1; nx++){
-            for(int ny = y-1; ny <= y+1; ny++){
-
-                if(checkX(nx)) break;
-                if(checkY(ny)) continue;
-
-                if (!cells[nx][ny].revealed && !cells[nx][ny].flaged)
-                    revealCells(nx, ny);
-            }
-        }
+    assert(!checkX(cx) && !checkY(cy) && "given arguments out of range");
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+        distrobuteBombs(cx, cy);
+        findBombs();
+        revealCells(cx, cy);
         return true;
     }
+    return false;
 
-    default:
-        cells[x][y].revealed = true;
-        break;
-    }
-    return true;
 }
 
 void Board::draw() const
@@ -152,16 +191,6 @@ void Board::findBombs()
     }
 }
 
-bool Board::containsMouse()
-{
-    int x;
-    int y;
-    return (x = GetMouseX()) > settings::BOARDX_OFF &&
-           x < settings::BOARDX_OFF + settings::BOARD_W * settings::CELL_S &&
-           (y = GetMouseY()) > settings::BOARDY_OFF &&
-           y < settings::BOARDY_OFF + settings::BOARD_H * settings::CELL_S;
-}
-
 // returns true in out of bounds
 inline bool Board::checkX(int x) const
 {
@@ -173,3 +202,10 @@ inline bool Board::checkY(int y) const
 {
     return y < 0 || y > hight-1;
 }
+
+inline bool Board::containsMouse() const
+{
+    return (GetMouseY() > settings::BOARDY_OFF) && (GetMouseY() < (settings::BOARDY_OFF + settings::BOARD_H * settings::CELL_S)) &&
+           (GetMouseX() > settings::BOARDX_OFF) && (GetMouseX() < (settings::BOARDX_OFF + settings::BOARD_W * settings::CELL_S));
+}
+

@@ -1,22 +1,22 @@
 #include "Game.hpp"
-
-inline uint32_t getBoardMouseY(void)
-{
-  return (GetMouseY() - settings::BOARDY_OFF) / settings::CELL_S;
-}
-
-inline uint32_t getBoardMouseX(void)
-{
-  return (GetMouseX() - settings::BOARDX_OFF) / settings::CELL_S;
-}
+#include <cassert>
 
 Game::Game()
 {
     InitWindow(settings::SCREEN_W, settings::SCREEN_H, "core");
     SetTargetFPS(settings::FPS);
 
-    //this->board = Board();
     this->state = EMPTY;
+
+    board.succesEvent.subAction([this] (EventArg* arg)
+                                {
+                                    SuccesEventArg* sucarg = dynamic_cast<SuccesEventArg*>(arg);
+                                    assert(sucarg != nullptr);
+                                    if (sucarg->succes == WIN)
+                                        this->state = WON;
+                                    else
+                                        this->state = OVER;
+                                });
 }
 
 void Game::gameLoop()
@@ -27,8 +27,6 @@ void Game::gameLoop()
     }
     
 }
-
-
 
 void Game::tick()
 {
@@ -50,37 +48,28 @@ void Game::draw() const
 
 void Game::update()
 {
-    int32_t x = getBoardMouseX();
-    int32_t y = getBoardMouseY();
 
+    int x;
+    int y;
     switch(state)
     {
     case EMPTY:
         {
-            board.clearBoard();
-            if(board.containsMouse() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                board.initCells(x, y);
-                board.revealCells(x, y);
+            if (board.tryInitCells())
                 state = RUNNING;
-            }
         }
         break;
     case RUNNING:
         {
-            if(board.containsMouse()){
-                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                    if(!board.revealCells(x, y)) state = OVER;
-                }else if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)){
-                    board.cells[x][y].flaged = !board.cells[x][y].flaged;
-                }
-            }
-            if(board.winState()) state = WON;
+            board.update();
         }
         break;
     case WON:
         {
-            if (IsKeyPressed(KEY_R))
+            if (IsKeyPressed(KEY_R)){
                 state = EMPTY;
+                board.clearBoard();
+            }
         }
         break;
     case OVER:
@@ -88,6 +77,7 @@ void Game::update()
             board.revealBombs();
             if (IsKeyPressed(KEY_R)){
                 state = EMPTY;
+                board.clearBoard();
             }
         }
         break;

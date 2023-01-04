@@ -1,6 +1,20 @@
 #include "Cell.hpp"
-#include <raylib.h>
 #include "settings.hpp"
+#include "Event.hpp"
+#include <raylib.h>
+
+enum SuccesState
+{
+    WIN = 0,
+    LOOSE
+};
+
+class SuccesEventArg : public EventArg
+{
+public:
+    SuccesState succes;
+    SuccesEventArg(SuccesState s) : succes(s) {};
+};
 
 class Board{
     public:
@@ -8,16 +22,18 @@ class Board{
     static const int32_t hight = settings::BOARD_H;
 
     Cell cells[width][hight];
+    Event succesEvent;
 
     void draw() const;
-    void distrobuteBombs(int32_t x, int32_t y);
-    bool winState();
-    void findBombs();
-    bool containsMouse();
-    bool revealCells(int32_t x, int32_t y);
-    void initCells(int32_t x, int32_t y);
+    void winState();
+    void revealCells(int32_t x, int32_t y);
+    void onSucces(SuccesState state);
     void clearBoard();
+    void distrobuteBombs(int32_t x, int32_t y);
+    void findBombs();
+    bool tryInitCells();
     void revealBombs();
+    void update();
 
     private:
     const Color colors[10] = {
@@ -37,4 +53,5 @@ class Board{
     bool forbiddenIdx(int32_t x, int32_t y, int32_t mx, int32_t my);
     inline bool checkX(int x) const;
     inline bool checkY(int y) const;
+    inline bool containsMouse() const;
 };
