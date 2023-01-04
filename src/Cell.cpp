@@ -1,7 +1,7 @@
 #include "Cell.hpp"
 #include "settings.hpp"
 #include <cstdint>
-#include <assert.h>
+#include <cassert>
 
 Cell::Cell()
 {

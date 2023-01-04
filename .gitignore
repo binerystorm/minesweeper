@@ -2,6 +2,7 @@
 .vs/
 .vscode/
 bin/
+**/cscope.out
 tags
 edit.bat
 build.bat
