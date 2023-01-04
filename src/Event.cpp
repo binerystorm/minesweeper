@@ -10,7 +10,7 @@ void Event::unsubAction(action act)
     subscriptions.pop_back();
 }
 
-void Event::trigger(EventArg arg)
+void Event::trigger(EventArg* arg)
 {
     for(action act : subscriptions)
     {
