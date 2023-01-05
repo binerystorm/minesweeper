@@ -1,6 +1,9 @@
 #include <vector>
 #include <functional>
 
+#ifndef __EVENT_H__
+#define __EVENT_H__
+
 class EventArg
 {
 public:
@@ -20,5 +23,6 @@ private:
     std::vector<action> subscriptions;
 
 };
+#endif // __EVENT_H__
 
 
