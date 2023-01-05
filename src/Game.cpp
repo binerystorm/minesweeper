@@ -8,15 +8,19 @@ Game::Game()
 
     this->state = EMPTY;
 
-    board.succesEvent.subAction([this] (EventArg* arg)
-                                {
-                                    SuccesEventArg* sucarg = dynamic_cast<SuccesEventArg*>(arg);
-                                    assert(sucarg != nullptr);
-                                    if (sucarg->succes == WIN)
-                                        this->state = WON;
-                                    else
-                                        this->state = OVER;
-                                });
+    restartButton.clickEvent.subAction(
+            [this] (EventArg* arg){
+                this->state = EMPTY;
+            });
+    board.succesEvent.subAction(
+            [this] (EventArg* arg){
+                SuccesEventArg* sucarg = dynamic_cast<SuccesEventArg*>(arg);
+                assert(sucarg != nullptr);
+                if (sucarg->succes == WIN)
+                    this->state = WON;
+                else
+                    this->state = OVER;
+            });
 }
 
 void Game::gameLoop()
@@ -44,6 +48,7 @@ void Game::draw() const
     //auto &lableList = menues[state];
     for(Lable l : menues.at(state))
         l.draw();
+    restartButton.draw();
 }
 
 void Game::update()
@@ -51,10 +56,12 @@ void Game::update()
 
     int x;
     int y;
+    restartButton.update();
     switch(state)
     {
     case EMPTY:
         {
+            board.clearBoard();
             if (board.tryInitCells())
                 state = RUNNING;
         }
@@ -68,7 +75,6 @@ void Game::update()
         {
             if (IsKeyPressed(KEY_R)){
                 state = EMPTY;
-                board.clearBoard();
             }
         }
         break;
@@ -77,7 +83,6 @@ void Game::update()
             board.revealBombs();
             if (IsKeyPressed(KEY_R)){
                 state = EMPTY;
-                board.clearBoard();
             }
         }
         break;

@@ -1,5 +1,6 @@
 #include "Lable.hpp"
 #include "Board.hpp"
+#include "Button.hpp"
 #include <map>
 #include <raylib.h>
 
@@ -16,6 +17,7 @@ class Game
 {
 public:
     Board board;
+    Button restartButton{200, 0, 100, 50, "rest"};
 private:
     GameState state;
     const std::map<GameState, std::vector<Lable>> menues =
