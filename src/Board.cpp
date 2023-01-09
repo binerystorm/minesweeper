@@ -3,16 +3,6 @@
 #include <iostream>
 #include <cassert>
 
-static inline uint32_t getBoardMouseY(void)
-{
-  return (GetMouseY() - settings::BOARDY_OFF) / settings::CELL_S;
-}
-
-static inline uint32_t getBoardMouseX(void)
-{
-  return (GetMouseX() - settings::BOARDX_OFF) / settings::CELL_S;
-}
-
 void Board::onSucces(SuccesState state)
 {
     SuccesEventArg arg = SuccesEventArg(state);
@@ -21,7 +11,7 @@ void Board::onSucces(SuccesState state)
 
 void Board::update()
 {
-    if (!containsMouse()) return;
+    if (!CheckCollisionPointRec((Vector2){(float)GetMouseX(), (float)GetMouseY()}, box)) return;
 
     uint32_t cx = getBoardMouseX();
     uint32_t cy = getBoardMouseY();
@@ -29,7 +19,7 @@ void Board::update()
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         revealCells(cx, cy);
     if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-        cells[cx][cy].flaged = !cells[cx][cy].flaged;
+        cells[idx(cx, cy)].flaged = !cells[idx(cx, cy)].flaged;
 
     winState();
 }
@@ -38,8 +28,8 @@ void Board::winState(){
     int flags = 0;
     for(int x = 0; x < width; x++){
         for(int y = 0; y < hight; y++){
-            if (!(cells[x][y].revealed || cells[x][y].flaged)) return;
-            if (!(cells[x][y].flaged && cells[x][y].val == 9))
+            if (!(cells[idx(x, y)].revealed || cells[idx(x, y)].flaged)) return;
+            if (!(cells[idx(x, y)].flaged   && cells[idx(x, y)].val == 9))
                 continue;
             flags++;
         }
@@ -50,24 +40,24 @@ void Board::winState(){
 
 void Board::revealCells(int32_t x, int32_t y)
 {
-    switch(cells[x][y].val){
+    switch(cells[idx(x, y)].val){
     case 9:
     {
-        cells[x][y].revealed = true;
+        cells[idx(x, y)].revealed = true;
         onSucces(LOOSE);
     }
     break;
 
     case 0:
     {
-        cells[x][y].revealed = true;
+        cells[idx(x, y)].revealed = true;
         for(int nx = x-1; nx <= x+1; nx++){
             for(int ny = y-1; ny <= y+1; ny++){
 
                 if(checkX(nx)) break;
                 if(checkY(ny)) continue;
 
-                if (!cells[nx][ny].revealed && !cells[nx][ny].flaged)
+                if (!cells[idx(nx, ny)].revealed && !cells[idx(nx, ny)].flaged)
                     revealCells(nx, ny);
             }
         }
@@ -75,7 +65,7 @@ void Board::revealCells(int32_t x, int32_t y)
     break;
 
     default:
-        cells[x][y].revealed = true;
+        cells[idx(x, y)].revealed = true;
         break;
     }
 }
@@ -84,10 +74,10 @@ void Board::revealBombs()
 {
     for(int x=0; x<width; x++){
         for(int y=0; y<hight; y++) {
-            if(cells[x][y].flaged)
+            if(cells[idx(x, y)].flaged)
                 continue;
-            if(cells[x][y].val == 9)
-                cells[x][y].revealed = true;
+            if(cells[idx(x, y)].val == 9)
+                cells[idx(x, y)].revealed = true;
         }
     }
 }
@@ -106,24 +96,17 @@ bool Board::forbiddenIdx(int32_t x, int32_t y, int32_t mx, int32_t my)
 
 void Board::clearBoard()
 {
-    for(int x=0; x<width; x++){
-        for(int y=0; y<hight; y++) {
-            cells[x][y].val = 0;
-            cells[x][y].flaged = false;
-            cells[x][y].revealed = false;
-            cells[x][y].color = GRAY;
-        }
-    }
+    memset(cells, 0, sizeof(Cell)*width*hight);
 }
 
 bool Board::tryInitCells()
 {
-    if (!containsMouse()) return false;
+    if (!CheckCollisionPointRec((Vector2){(float)GetMouseX(), (float)GetMouseY()}, box)) return false;
 
     uint32_t cx = getBoardMouseX();
     uint32_t cy = getBoardMouseY();
+    assert(!checkX(cx) && !checkY(cy) && "argument provided are incorect");
 
-    assert(!checkX(cx) && !checkY(cy) && "given arguments out of range");
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
         distrobuteBombs(cx, cy);
         findBombs();
@@ -138,7 +121,7 @@ void Board::draw() const
 {
     for(int x=0; x<width; x++){
         for(int y=0; y<hight; y++)
-            cells[x][y].draw(
+            cells[idx(x, y)].draw(
                 settings::BOARDX_OFF + x * settings::CELL_S,
                 settings::BOARDY_OFF + y * settings::CELL_S
             );
@@ -147,8 +130,9 @@ void Board::draw() const
 
 void Board::distrobuteBombs(int32_t mx, int32_t my)
 {
+    // TODO(gerick): figure out the chance system with floating point numbers
     int bombs = settings::BOMBS;
-    int spots = settings::CELL_C - 9;
+    int spots = width*hight - 9;
 
 
     for(int x = 0; x < width; x++)
@@ -162,12 +146,14 @@ void Board::distrobuteBombs(int32_t mx, int32_t my)
 
             int c = (spots--/bombs)-1;
 
+            assert(c > 0 && "can't devide (or mod) by 0");
             if(rand()%c == 0){
-                cells[x][y].val = 9;
+                cells[idx(x, y)].val = 9;
                 bombs--;
             }
         }
     }
+    assert(bombs == 0);
 }
 
 void Board::findBombs()
@@ -180,13 +166,13 @@ void Board::findBombs()
                     if(checkX(nx)) break;
                     if (checkY(ny)) continue;
 
-                    if(cells[nx][ny].val == 9 && cells[x][y].val < 9){
-                        cells[x][y].val++;
-                        assert(cells[x][y].val < 9);
+                    if(cells[idx(nx, ny)].val == 9 && cells[idx(x, y)].val < 9){
+                        cells[idx(x, y)].val++;
+                        assert(cells[idx(x, y)].val < 9);
                     }
                 }
             }
-            cells[x][y].color = colors[cells[x][y].val];
+            cells[idx(x, y)].color = colors[cells[idx(x, y)].val];
         }
     }
 }
@@ -203,9 +189,13 @@ inline bool Board::checkY(int y) const
     return y < 0 || y > hight-1;
 }
 
-inline bool Board::containsMouse() const
+inline uint32_t Board::getBoardMouseY(void) const
 {
-    return (GetMouseY() > settings::BOARDY_OFF) && (GetMouseY() < (settings::BOARDY_OFF + settings::BOARD_H * settings::CELL_S)) &&
-           (GetMouseX() > settings::BOARDX_OFF) && (GetMouseX() < (settings::BOARDX_OFF + settings::BOARD_W * settings::CELL_S));
+  return (GetMouseY() - boardY) / settings::CELL_S;
 }
 
+inline uint32_t Board::getBoardMouseX(void) const
+{
+  return (GetMouseX() - boardX) / settings::CELL_S;
+}
+inline Board::idx(const int x, const int y) const {return width*y+x;}

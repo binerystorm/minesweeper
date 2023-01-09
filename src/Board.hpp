@@ -18,10 +18,19 @@ public:
 
 class Board{
     public:
-    static const int32_t width = settings::BOARD_W;
-    static const int32_t hight = settings::BOARD_H;
+    const int width = settings::BOARD_W;
+    const int hight = settings::BOARD_H;
+    int32_t boardX = settings::BOARDX_OFF;
+    int32_t boardY = settings::BOARDY_OFF;
+    Rectangle box = {
+        (float)boardX,
+        (float)boardY,
+        // -1 for because the raylib checkcolisions function is boundry inclusive
+        (float)width * settings::CELL_S - 1,
+        (float)hight * settings::CELL_S - 1,
+    };
 
-    Cell cells[width][hight];
+    Cell *cells = new Cell[width*hight]();
     Event succesEvent;
 
     void draw() const;
@@ -53,5 +62,7 @@ class Board{
     bool forbiddenIdx(int32_t x, int32_t y, int32_t mx, int32_t my);
     inline bool checkX(int x) const;
     inline bool checkY(int y) const;
-    inline bool containsMouse() const;
+    inline uint32_t getBoardMouseY(void) const;
+    inline uint32_t getBoardMouseX(void) const;
+    inline idx(const int x, const int y) const;
 };

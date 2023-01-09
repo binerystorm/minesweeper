@@ -45,7 +45,6 @@ void Game::tick()
 void Game::draw() const
 {
     board.draw();
-    //auto &lableList = menues[state];
     for(Lable l : menues.at(state))
         l.draw();
     restartButton.draw();

@@ -6,7 +6,7 @@
 Cell::Cell()
 {
     this->val = 0;
-    this->color = GRAY;
+    this->color = (Color){0,0,0};
     this->revealed = false;
     this->flaged = false;
 }
