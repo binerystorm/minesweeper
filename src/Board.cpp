@@ -3,6 +3,20 @@
 #include <iostream>
 #include <cassert>
 
+Board::Board(const int width,
+             const int hight) : width(width), hight(hight)
+{
+    boardX = (settings::SCREEN_W - width*settings::CELL_S) / 2;
+    boardY = (settings::SCREEN_H - hight*settings::CELL_S) / 2;
+    box = {
+        (float)boardX,
+        (float)boardY,
+        // -1 for because the raylib checkcolisions function is boundry inclusive
+        (float)width * settings::CELL_S - 1,
+        (float)hight * settings::CELL_S - 1,
+    };
+}
+
 void Board::onSucces(SuccesState state)
 {
     SuccesEventArg arg = SuccesEventArg(state);
@@ -122,8 +136,8 @@ void Board::draw() const
     for(int x=0; x<width; x++){
         for(int y=0; y<hight; y++)
             cells[idx(x, y)].draw(
-                settings::BOARDX_OFF + x * settings::CELL_S,
-                settings::BOARDY_OFF + y * settings::CELL_S
+                boardX + x * settings::CELL_S,
+                boardY + y * settings::CELL_S
             );
     }
 }

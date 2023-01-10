@@ -16,7 +16,7 @@ typedef enum
 class Game
 {
 public:
-    Board board;
+    Board board{10, 10};
     Button restartButton{200, 0, 100, 50, "rest"};
 private:
     GameState state;

@@ -18,21 +18,17 @@ public:
 
 class Board{
     public:
-    const int width = settings::BOARD_W;
-    const int hight = settings::BOARD_H;
-    int32_t boardX = settings::BOARDX_OFF;
-    int32_t boardY = settings::BOARDY_OFF;
-    Rectangle box = {
-        (float)boardX,
-        (float)boardY,
-        // -1 for because the raylib checkcolisions function is boundry inclusive
-        (float)width * settings::CELL_S - 1,
-        (float)hight * settings::CELL_S - 1,
-    };
+    const int32_t width;
+    const int32_t hight;
+    int32_t boardX;
+    int32_t boardY;
+    Rectangle box;
 
     Cell *cells = new Cell[width*hight]();
     Event succesEvent;
 
+    Board(const int width = settings::BOARD_W,
+          const int hight = settings::BOARD_H);
     void draw() const;
     void winState();
     void revealCells(int32_t x, int32_t y);
