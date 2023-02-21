@@ -8,6 +8,24 @@ Game::Game()
 
     this->state = EMPTY;
 
+    board9x9.clickEvent.subAction(
+            [this] (EventArg* arg){
+                this->board = Board{9, 9, 10};
+                this->state = EMPTY;
+            }
+        );
+    board16x16.clickEvent.subAction(
+            [this] (EventArg* arg){
+                this->board = Board{16, 16, 40};
+                this->state = EMPTY;
+            }
+        );
+    board16x30.clickEvent.subAction(
+            [this] (EventArg* arg){
+                this->board = Board{16, 30, 99}; 
+                this->state = EMPTY;
+            }
+        );
     restartButton.clickEvent.subAction(
             [this] (EventArg* arg){
                 this->state = EMPTY;
@@ -45,9 +63,14 @@ void Game::tick()
 void Game::draw() const
 {
     board.draw();
+    if(state == OVER)
+        DrawRectangleRec(board.box, (Color){150, 150, 150, 200});
     for(Lable l : menues.at(state))
         l.draw();
     restartButton.draw();
+    board16x16.draw();
+    board16x30.draw();
+    board9x9.draw();
 }
 
 void Game::update()
@@ -56,6 +79,9 @@ void Game::update()
     int x;
     int y;
     restartButton.update();
+    board9x9.update();
+    board16x16.update();
+    board16x30.update();
     switch(state)
     {
     case EMPTY:

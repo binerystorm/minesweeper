@@ -16,16 +16,23 @@ typedef enum
 class Game
 {
 public:
-    Board board{10, 10};
-    Button restartButton{200, 0, 100, 50, "rest"};
+    Board board;
+    Button restartButton{settings::SCREEN_W/2 - 50, 50, 100, 50, "reset"};
+    Button board9x9{50, settings::SCREEN_H/5*1, 75, 50, "9x9"};
+    Button board16x16{50, settings::SCREEN_H/5*2, 75, 50, "16x16"};
+    Button board16x30{50, settings::SCREEN_H/5*3, 75, 50, "16x30"};
 private:
     GameState state;
     const std::map<GameState, std::vector<Lable>> menues =
     {
-        {EMPTY, {Lable(0, 0, "click")}},
+        {EMPTY, {Lable(settings::SCREEN_W/2-25, 110, "click")}},
         {RUNNING, {}},
-        {WON, {Lable(0, 0, "You Won!")}},
-        {OVER, {Lable(0,0, "Game Over!"), Lable(100, 100, "press `r` to try again")}},
+        {WON, {Lable(settings::SCREEN_W/2-75,settings::SCREEN_H/2-10, "You Won!")}},
+        {OVER, {
+            Lable(settings::SCREEN_W/2-75,settings::SCREEN_H/2-10, "Game Over!"), 
+            Lable(settings::SCREEN_W/2-130, 110, "press `r` to try again")
+            }
+        },
     };
 public:
     Game();
