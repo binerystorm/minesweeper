@@ -6,6 +6,7 @@ class Button
 {
 public:
     Rectangle box;
+    Vector2 textPos;
     Event clickEvent;
     const std::string text;
 

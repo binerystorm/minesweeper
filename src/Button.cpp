@@ -1,4 +1,5 @@
 #include "Button.hpp"
+#include <iostream>
 
 Button::Button(const int x, const int y,
                const int width, const int height,
@@ -27,11 +28,11 @@ void Button::update()
 
 void Button::draw() const
 {
-    DrawRectangleLinesEx(box, 0.5, BLUE);
-    Vector2 textSize = MeasureTextEx(GetFontDefault(), text.c_str(), 20.0f, 1.0f);
+    DrawRectangleLinesEx(box, 2, BLUE);
+    Vector2 textSize = MeasureTextEx(GetFontDefault(), text.c_str(), 20.0f, 1.5f);
     Vector2 textPos = {
         .x = box.x + box.width/2 - textSize.x/2,
         .y = box.y + box.height/2 - textSize.y/2,
     };
-    DrawTextEx(GetFontDefault(), text.c_str(), textPos, 20.0f, 1.0f, DARKBLUE);
+    DrawTextEx(GetFontDefault(), text.c_str(), textPos, 24.0f, 1.5f, DARKBLUE);
 }

@@ -4,7 +4,8 @@
 #include <cassert>
 
 Board::Board(const int width,
-             const int hight) : width(width), hight(hight)
+             const int hight,
+             const int bombs) : width(width), hight(hight), bombs(bombs)
 {
     boardX = (settings::SCREEN_W - width*settings::CELL_S) / 2;
     boardY = (settings::SCREEN_H - hight*settings::CELL_S) / 2;
@@ -48,7 +49,7 @@ void Board::winState(){
             flags++;
         }
     }
-    if(flags == settings::BOMBS)
+    if(flags == bombs)
         onSucces(WIN);
 }
 
@@ -145,7 +146,7 @@ void Board::draw() const
 void Board::distrobuteBombs(int32_t mx, int32_t my)
 {
     // TODO(gerick): figure out the chance system with floating point numbers
-    int bombs = settings::BOMBS;
+    int boms = bombs;
     int spots = width*hight - 9;
 
 
@@ -155,19 +156,19 @@ void Board::distrobuteBombs(int32_t mx, int32_t my)
         {
             if(forbiddenIdx(x, y, mx, my))
                 continue;
-            if (bombs == 0)
+            if (boms == 0)
                 break;
 
-            int c = (spots--/bombs)-1;
+            int c = (spots--/boms)-1;
 
             assert(c > 0 && "can't devide (or mod) by 0");
             if(rand()%c == 0){
                 cells[idx(x, y)].val = 9;
-                bombs--;
+                boms--;
             }
         }
     }
-    assert(bombs == 0);
+    assert(boms == 0);
 }
 
 void Board::findBombs()
@@ -212,4 +213,4 @@ inline uint32_t Board::getBoardMouseX(void) const
 {
   return (GetMouseX() - boardX) / settings::CELL_S;
 }
-inline Board::idx(const int x, const int y) const {return width*y+x;}
+inline int Board::idx(const int x, const int y) const {return width*y+x;}

@@ -18,17 +18,19 @@ public:
 
 class Board{
     public:
-    const int32_t width;
-    const int32_t hight;
+    int32_t width;
+    int32_t hight;
+    int bombs;
     int32_t boardX;
     int32_t boardY;
     Rectangle box;
 
     Cell *cells = new Cell[width*hight]();
-    Event succesEvent;
+    static Event succesEvent;
 
     Board(const int width = settings::BOARD_W,
-          const int hight = settings::BOARD_H);
+          const int hight = settings::BOARD_H,
+          const int bombs = settings::BOMBS);
     void draw() const;
     void winState();
     void revealCells(int32_t x, int32_t y);
@@ -41,7 +43,7 @@ class Board{
     void update();
 
     private:
-    const Color colors[10] = {
+    constexpr static Color colors[10] = {
         GRAY,
         BLUE,
         GREEN,
