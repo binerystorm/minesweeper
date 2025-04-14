@@ -26,7 +26,7 @@ class Board{
     Rectangle box;
 
     Cell *cells = new Cell[width*hight]();
-    static Event succesEvent;
+    Event succesEvent;
 
     Board(const int width = settings::BOARD_W,
           const int hight = settings::BOARD_H,
@@ -62,5 +62,5 @@ class Board{
     inline bool checkY(int y) const;
     inline uint32_t getBoardMouseY(void) const;
     inline uint32_t getBoardMouseX(void) const;
-    inline idx(const int x, const int y) const;
+    inline int idx(const int x, const int y) const;
 };

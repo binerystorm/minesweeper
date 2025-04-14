@@ -20,7 +20,7 @@ public:
     void unsubAction(action act);
     void trigger(EventArg* arg);
 private:
-    std::vector<action> subscriptions;
+    std::vector<action> subscriptions = {};
 
 };
 #endif // __EVENT_H__

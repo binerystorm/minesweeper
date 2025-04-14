@@ -18,7 +18,7 @@ namespace settings
     inline constexpr unsigned int BOARD_H    = 16;
     inline constexpr unsigned int CELL_C     = BOARD_H*BOARD_W;
     inline constexpr unsigned int CELL_S     = 25;
-    inline constexpr unsigned int BOMBS      = 40;
+    inline constexpr unsigned int BOMBS      = 10;
     inline constexpr unsigned int BOARDX_OFF = (SCREEN_W - BOARD_W * CELL_S) / 2;
     inline constexpr unsigned int BOARDY_OFF = (SCREEN_H - BOARD_H * CELL_S) / 2;
 
